@@ -1,0 +1,6 @@
+Die geringste Bewertung eines Hotels ist 0.3
+Die Distanzen, an denen ein Hotel aufgesucht wird sind:
+360
+717
+1076
+1433

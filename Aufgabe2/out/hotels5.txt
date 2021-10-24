@@ -1,0 +1,6 @@
+Die geringste Bewertung eines Hotels ist 5
+Die Distanzen, an denen ein Hotel aufgesucht wird sind:
+317
+636
+987
+1286

@@ -1,0 +1,187 @@
+//
+// Created by Theodor Teslia on 26.10.21.
+//
+
+#include "Classes.h"
+
+
+Die::Die(const std::vector<int>& pSides) {
+	this->sides = pSides;
+	srand((unsigned)time(nullptr));
+}
+
+int Die::roll() {
+	return sides.at(rand() % sides.size());
+}
+
+
+Figure::Figure() {
+	this->position = 0;
+	this->field = Fields::B;
+}
+
+void Figure::moveBy(int val) {
+	this->position += val;
+}
+
+void Figure::setField(Fields pField) {
+	this->field = pField;
+}
+
+void Figure::setPosition(int pos) {
+	this->position = pos;
+}
+
+int Figure::getPosition() const {
+	return this->position;
+}
+
+Fields Figure::getField() const {
+	return this->field;
+}
+
+bool Figure::operator< (const Figure& f2) const {
+	if (this->position == f2.position) {
+		return this->getField() == Fields::RUNWAY;
+	}
+	return this->position > f2.position;
+}
+
+
+Player::Player() {
+	this->currentDie = nullptr;
+	this->board = std::array<Figure*, boardLength>();
+	this->figs = std::array<Figure, 4>();
+	this->alreadyMovedInTurn = true;
+
+	std::fill_n(this->board.begin(), boardLength, nullptr);
+	std::fill_n(this->figs.begin(), 4, Figure());
+
+	board.at(0) = &figs.at(0);
+	figs.at(0).setField(Fields::RUNWAY);
+
+	std::sort(figs.begin(), figs.end());
+}
+
+void Player::move() {
+	if (this->currentDie == nullptr) {
+		return;
+	}
+	this->alreadyMovedInTurn = false;
+
+	int dieResult = this->currentDie->roll();
+
+	if (board.at(0) != nullptr) {  // Still figure on start field -> Needs to be moved away
+		for (unsigned int i = figs.size()-1; i >= 0; i--) {  // Start from last figure
+			if (board.at(figs.at(i).getPosition() + dieResult) == nullptr && figs.at(i).getField() == Fields::RUNWAY) {
+				changePosition((int)i, dieResult);  // Casting becuse my IDE annoys me with unsigned int to int warning
+				break;
+			}
+		}
+
+		if (dieResult == 6) {
+			this->move();
+		}
+	}
+
+	if (dieResult == 6 && !everythingOn(Fields::RUNWAY)) {
+		Figure* firstOnB = nullptr;
+		for (auto& fig : figs) {
+			if (fig.getField() == Fields::B) {
+				firstOnB = &fig;
+				break;
+			}
+		}
+		firstOnB->setField(Fields::RUNWAY);
+		firstOnB->setPosition(0);
+		board.at(0) = firstOnB;
+
+		this->move();
+	}
+
+	if (everythingOn(Fields::B) && dieResult != 6) {  // Everything on B and no 6 -> Nothing can move out
+		return;
+	}
+	for (int i = 0; i < figs.size(); i++) {  // Search for first element that can move
+		int nextPos = figs.at(i).getPosition() + dieResult;
+
+		if (nextPos < board.size() && figs.at(i).getField() == Fields::RUNWAY) {
+			if (board.at(nextPos) == nullptr) {
+				changePosition(i, dieResult);
+				break;
+			}
+		}
+
+	}
+
+	if (dieResult == 6) {
+		this->move();
+	}
+}
+
+void Player::changePosition(int index, int amount) {
+	if (this->alreadyMovedInTurn) {
+		return;
+	}
+	board.at(figs.at(index).getPosition()) = nullptr;
+	figs.at(index).moveBy(amount);
+	board.at(figs.at(index).getPosition()) = &figs.at(index);
+
+	std::sort(figs.begin(), figs.end());
+	this->alreadyMovedInTurn = true;
+}
+
+bool Player::everythingOn(Fields type) {
+	for (Figure f : figs) {
+		if (f.getField() != type) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void Player::canHit(Player& ply2) {
+	std::vector<Figure*> f1, f2;
+	fillActivePlayers(f1);
+	fillActivePlayers(f2);
+
+	for (auto& i : f1) {
+		int adjustedIndex = (10 + i->getPosition() - (boardLength-4)/2) % 10;
+		for (auto& j : f2) {
+			if (adjustedIndex == j->getPosition()) {
+				ply2.board.at(j->getPosition()) = nullptr;
+				j->setField(Fields::B);
+				j->setPosition(0);
+			}
+		}
+	}
+}
+
+void Player::fillActivePlayers(std::vector<Figure*>& vct) {
+	for (Figure& f : this->figs) {
+		if (f.getPosition() < 40 && f.getField() == Fields::RUNWAY) {
+			vct.push_back(&f);
+		}
+	}
+}
+
+bool Player::won() {
+	for (unsigned int i = board.size()-1; i >= board.size() - 4; i++) {
+		if (board.at(i) == nullptr) {
+			return false;
+		}
+	}
+	return true;
+}
+
+void Player::giveDie(Die* newDie) {
+	this->currentDie = newDie;
+}
+
+std::array<Figure*, boardLength> Player::getBoard() const {
+	return this->board;
+}
+
+std::array<Figure, 4> Player::getFigures() const {
+	return this->figs;
+}

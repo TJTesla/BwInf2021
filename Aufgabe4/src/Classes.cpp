@@ -4,14 +4,28 @@
 
 #include "Classes.h"
 
+// TODO: Clean up file:
+// TODO: Remove debugging helpers; add comments
 
 Die::Die(const std::vector<int>& pSides) {
 	this->sides = pSides;
 	srand((unsigned)time(nullptr));
+
+	this->has6 = false;
+	for (int& s : this->sides) {
+		if (s == 6) {
+			this->has6 = true;
+			break;
+		}
+	}
 }
 
 int Die::roll() {
 	return sides.at(rand() % sides.size());
+}
+
+bool Die::gotNo6() const {
+	return !has6;
 }
 
 
@@ -52,7 +66,7 @@ Player::Player() {
 	this->currentDie = nullptr;
 	this->board = std::array<Figure*, boardLength>();
 	this->figs = std::array<Figure, 4>();
-	this->alreadyMovedInTurn = true;
+	this->alreadyMovedInTurn = false;
 
 	std::fill_n(this->board.begin(), boardLength, nullptr);
 	std::fill_n(this->figs.begin(), 4, Figure());
@@ -72,31 +86,71 @@ void Player::move() {
 	int dieResult = this->currentDie->roll();
 
 	if (board.at(0) != nullptr) {  // Still figure on start field -> Needs to be moved away
-		for (unsigned int i = figs.size()-1; i >= 0; i--) {  // Start from last figure
-			if (board.at(figs.at(i).getPosition() + dieResult) == nullptr && figs.at(i).getField() == Fields::RUNWAY) {
-				changePosition((int)i, dieResult);  // Casting becuse my IDE annoys me with unsigned int to int warning
+		for (int i = figs.size() - 1; i >= 0; i--) {  // Start from last figure
+			int nextPosition = figs.at(i).getPosition() + dieResult;
+			if (nextPosition >= board.size()) {
+				continue;
+			}
+			if (board.at(nextPosition) == nullptr && figs.at(i).getField() == Fields::RUNWAY) {
+				changePosition((int) i, dieResult);  // Casting becuse my IDE annoys me with unsigned int to int warning
 				break;
 			}
+		}
+
+		int uC = 0;
+		for (auto f : board) {
+			if (f != nullptr)
+				uC += 1;
+		}
+		for (int i = 0; i < uC; i++) {
+			if (figs.at(i).getField() == Fields::B) {
+				;
+			}
+		}
+		if (uC > 4) {
+			;
 		}
 
 		if (dieResult == 6) {
 			this->move();
+		} else {
+			return;
 		}
 	}
 
-	if (dieResult == 6 && !everythingOn(Fields::RUNWAY)) {
-		Figure* firstOnB = nullptr;
-		for (auto& fig : figs) {
-			if (fig.getField() == Fields::B) {
-				firstOnB = &fig;
+	if (dieResult == 6) {
+		int firstOnBIndex = -1;
+		for (int i = 0; i < figs.size(); i++) {
+			if (figs.at(i).getField() == Fields::B) {
+				firstOnBIndex = i;
 				break;
 			}
 		}
-		firstOnB->setField(Fields::RUNWAY);
-		firstOnB->setPosition(0);
-		board.at(0) = firstOnB;
+		if (firstOnBIndex != -1) {
+			figs.at(firstOnBIndex).setField(Fields::RUNWAY);
+			figs.at(firstOnBIndex).setPosition(0);
+			board.at(0) = &(figs.at(firstOnBIndex));
 
-		this->move();
+			std::sort(figs.begin(), figs.end());
+			this->alreadyMovedInTurn = true;
+
+
+			int uC = 0;
+			for (auto f : board) {
+				if (f != nullptr)
+					uC += 1;
+			}
+			if (uC > 4) {
+				;
+			}
+			for (int i = 0; i < uC; i++) {
+				if (figs.at(i).getField() == Fields::B) {
+					;
+				}
+			}
+
+			this->move();
+		}
 	}
 
 	if (everythingOn(Fields::B) && dieResult != 6) {  // Everything on B and no 6 -> Nothing can move out
@@ -104,14 +158,29 @@ void Player::move() {
 	}
 	for (int i = 0; i < figs.size(); i++) {  // Search for first element that can move
 		int nextPos = figs.at(i).getPosition() + dieResult;
+		if (nextPos >= board.size()) {
+			continue;
+		}
 
-		if (nextPos < board.size() && figs.at(i).getField() == Fields::RUNWAY) {
+		if (figs.at(i).getField() == Fields::RUNWAY) {
 			if (board.at(nextPos) == nullptr) {
 				changePosition(i, dieResult);
 				break;
 			}
 		}
-
+	}
+	int uC = 0;
+	for (auto f : board) {
+		if (f != nullptr)
+			uC += 1;
+	}
+	for (int i = 0; i < uC; i++) {
+		if (figs.at(i).getField() == Fields::B) {
+			;
+		}
+	}
+	if (uC > 4) {
+		;
 	}
 
 	if (dieResult == 6) {
@@ -141,37 +210,82 @@ bool Player::everythingOn(Fields type) {
 }
 
 void Player::canHit(Player& ply2) {
+	int uC = 0;
+	for (auto f : board) {
+		if (f != nullptr)
+			uC += 1;
+	}
+	if (uC > 4) {
+		;
+	}
+	for (int i = 0; i < uC; i++) {
+		if (figs.at(i).getField() == Fields::B) {
+			;
+		}
+	}
+
+
+
 	std::vector<Figure*> f1, f2;
-	fillActivePlayers(f1);
-	fillActivePlayers(f2);
+	fillActivePlayers(f1, this->figs);
+	fillActivePlayers(f2, ply2.figs);
+
+	int tempBoardLength = boardLength-4;
 
 	for (auto& i : f1) {
-		int adjustedIndex = (10 + i->getPosition() - (boardLength-4)/2) % 10;
+		int adjustedIndex = (tempBoardLength + i->getPosition() - (tempBoardLength-4)/2) % tempBoardLength;
 		for (auto& j : f2) {
+
 			if (adjustedIndex == j->getPosition()) {
 				ply2.board.at(j->getPosition()) = nullptr;
 				j->setField(Fields::B);
 				j->setPosition(0);
 			}
+
 		}
 	}
+
+	uC = 0;
+	for (auto f : board) {
+		if (f != nullptr)
+			uC += 1;
+	}
+	if (uC > 4) {
+		;
+	}
+	for (int i = 0; i < uC; i++) {
+		if (figs.at(i).getField() == Fields::B) {
+			;
+		}
+	}
+
 }
 
-void Player::fillActivePlayers(std::vector<Figure*>& vct) {
-	for (Figure& f : this->figs) {
-		if (f.getPosition() < 40 && f.getField() == Fields::RUNWAY) {
+void Player::fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figure, 4>& figArr) {
+	for (Figure f : figArr) {
+		if (f.getPosition() < boardLength-4 && f.getField() == Fields::RUNWAY) {
 			vct.push_back(&f);
 		}
 	}
 }
 
 bool Player::won() {
-	for (unsigned int i = board.size()-1; i >= board.size() - 4; i++) {
+	for (int i = board.size()-1; i >= board.size() - 4; i--) {
 		if (board.at(i) == nullptr) {
 			return false;
 		}
 	}
 	return true;
+}
+
+void Player::initialize() {
+	std::fill_n(this->board.begin(), boardLength, nullptr);
+	std::fill_n(this->figs.begin(), 4, Figure());
+
+	board.at(0) = &figs.at(0);
+	figs.at(0).setField(Fields::RUNWAY);
+
+	std::sort(figs.begin(), figs.end());
 }
 
 void Player::giveDie(Die* newDie) {

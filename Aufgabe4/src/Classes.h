@@ -55,7 +55,7 @@ private:  // Attributes
 private:  // Functions
 	bool everythingOn(Fields type);
 	void changePosition(int index, int amount);
-	void fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figure, 4>& figArr);
+	static void fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figure, 4>& figArr);
 
 public:
 	Player();
@@ -65,11 +65,6 @@ public:
 	bool won();
 	void giveDie(Die* newDie);
 	void initialize();
-
-	[[nodiscard]] std::array<Figure*, boardLength> getBoard() const;
-	[[nodiscard]] std::array<Figure, 4> getFigures() const;
-
-	Die* getDie() { return this->currentDie; }
 };
 
 #endif //AUFGABE4_CLASSES_H

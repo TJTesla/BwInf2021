@@ -5,7 +5,7 @@
 #include "Classes.h"
 
 // TODO: Clean up file:
-// TODO: Remove debugging helpers; add comments
+// TODO: Add comments
 
 Die::Die(const std::vector<int>& pSides) {
 	this->sides = pSides;
@@ -97,20 +97,6 @@ void Player::move() {
 			}
 		}
 
-		int uC = 0;
-		for (auto f : board) {
-			if (f != nullptr)
-				uC += 1;
-		}
-		for (int i = 0; i < uC; i++) {
-			if (figs.at(i).getField() == Fields::B) {
-				;
-			}
-		}
-		if (uC > 4) {
-			;
-		}
-
 		if (dieResult == 6) {
 			this->move();
 		} else {
@@ -134,21 +120,6 @@ void Player::move() {
 			std::sort(figs.begin(), figs.end());
 			this->alreadyMovedInTurn = true;
 
-
-			int uC = 0;
-			for (auto f : board) {
-				if (f != nullptr)
-					uC += 1;
-			}
-			if (uC > 4) {
-				;
-			}
-			for (int i = 0; i < uC; i++) {
-				if (figs.at(i).getField() == Fields::B) {
-					;
-				}
-			}
-
 			this->move();
 		}
 	}
@@ -168,19 +139,6 @@ void Player::move() {
 				break;
 			}
 		}
-	}
-	int uC = 0;
-	for (auto f : board) {
-		if (f != nullptr)
-			uC += 1;
-	}
-	for (int i = 0; i < uC; i++) {
-		if (figs.at(i).getField() == Fields::B) {
-			;
-		}
-	}
-	if (uC > 4) {
-		;
 	}
 
 	if (dieResult == 6) {
@@ -210,22 +168,6 @@ bool Player::everythingOn(Fields type) {
 }
 
 void Player::canHit(Player& ply2) {
-	int uC = 0;
-	for (auto f : board) {
-		if (f != nullptr)
-			uC += 1;
-	}
-	if (uC > 4) {
-		;
-	}
-	for (int i = 0; i < uC; i++) {
-		if (figs.at(i).getField() == Fields::B) {
-			;
-		}
-	}
-
-
-
 	std::vector<Figure*> f1, f2;
 	fillActivePlayers(f1, this->figs);
 	fillActivePlayers(f2, ply2.figs);
@@ -244,21 +186,6 @@ void Player::canHit(Player& ply2) {
 
 		}
 	}
-
-	uC = 0;
-	for (auto f : board) {
-		if (f != nullptr)
-			uC += 1;
-	}
-	if (uC > 4) {
-		;
-	}
-	for (int i = 0; i < uC; i++) {
-		if (figs.at(i).getField() == Fields::B) {
-			;
-		}
-	}
-
 }
 
 void Player::fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figure, 4>& figArr) {
@@ -270,7 +197,7 @@ void Player::fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figur
 }
 
 bool Player::won() {
-	for (int i = board.size()-1; i >= board.size() - 4; i--) {
+	for (unsigned int i = board.size()-1; i >= board.size() - 4; i--) {
 		if (board.at(i) == nullptr) {
 			return false;
 		}
@@ -290,12 +217,4 @@ void Player::initialize() {
 
 void Player::giveDie(Die* newDie) {
 	this->currentDie = newDie;
-}
-
-std::array<Figure*, boardLength> Player::getBoard() const {
-	return this->board;
-}
-
-std::array<Figure, 4> Player::getFigures() const {
-	return this->figs;
 }

@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <array>
+#include <set>
 #include <ctime>
 #include <random>
 #include <algorithm>
@@ -48,7 +49,7 @@ public:
 class Player {
 private:  // Attributes
 	Die* currentDie;
-	std::array<Figure*, boardLength> board{};
+	std::set<int> occupiedSpaces;
 	std::array<Figure, 4> figs;
 	bool alreadyMovedInTurn;
 
@@ -56,6 +57,8 @@ private:  // Functions
 	bool everythingOn(Fields type);
 	void changePosition(int index, int amount);
 	static void fillActivePlayers(std::vector<Figure*>& vct, const std::array<Figure, 4>& figArr);
+	bool onField(const int& f);
+	void sortFigures();
 
 public:
 	Player();

@@ -5,8 +5,6 @@
 
 #include "Classes.h"
 
-// TODO: Print in output file; Change iterations number
-
 /*
  * Error codes:
  * 4: Could not reach input file
@@ -66,8 +64,8 @@ int main(int argc, char* argv[]) {
 						ply2.canHit(ply1);
 					}
 					ply1Turn = !ply1Turn;
-					if (turns >= 1000) {  // Justification: Algorithm should model reality. In reality no one would play a game for over 1000 turns
-						break;
+					if (turns >= 500) {  // Justification: Algorithm should model reality. In reality no one would play a game for over 1000 turns
+						break;  // TODO: Alg to determine if player can still win
 					}
 					turns++;
 				} while (!(ply1.won() || ply2.won()));

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 #include <fstream>
 
 #include "Classes.h"
@@ -17,6 +18,7 @@ constexpr int iterations = 10000;  // Just for testing purposes; Production valu
 bool getDice(const std::string& file);
 void fillResult(std::vector<std::vector<int>>& r, std::vector<int>& generalR);
 bool output(const std::string& file, const std::vector<std::vector<int>>& result, const std::vector<int>& absoluteWins);
+bool determineWinable(Player& ply);
 
 
 int main(int argc, char* argv[]) {
@@ -55,17 +57,31 @@ int main(int argc, char* argv[]) {
 			for (int k = 0; k < iterations; k++) {
 				bool ply1Turn = k % 2;  // Set alternating to true and false
 				int turns = 0;
+				int notMovedSince = 0;
 				do {  // Loop for one game
 					if (ply1Turn) {
-						ply1.move();
+						if (ply1.move()) {
+							notMovedSince = 0;
+						} else {
+							notMovedSince += 1;
+						}
 						ply1.canHit(ply2);
 					} else {
-						ply2.move();
+						if (ply2.move()) {
+							notMovedSince = 0;
+						} else {
+							notMovedSince += 1;
+						}
 						ply2.canHit(ply1);
 					}
 					ply1Turn = !ply1Turn;
-					if (turns >= 500) {  // Justification: Algorithm should model reality. In reality no one would play a game for over 1000 turns
-						break;  // TODO: Alg to determine if player can still win
+					if (turns >= 500) {  // Game is going very long -> Check if there is a softlock
+						if (!determineWinable(ply1) && !determineWinable(ply2)) {
+							break;
+						}
+					}
+					if (notMovedSince >= 200) {  // If there was no movement for 200 turns -> Only very slim chance there is no softlock
+						break;  // In reality a game would be quit if nobody moved for 200 turns as well
 					}
 					turns++;
 				} while (!(ply1.won() || ply2.won()));
@@ -77,18 +93,13 @@ int main(int argc, char* argv[]) {
 					result.at(j).at(i) += 1;  // Second player wins
 					absoluteWins.at(j) += 1;
 				}
-				if (turns > longestMatch) {
-					longestMatch = turns;
-				}
+
 				ply1.initialize();
 				ply2.initialize();
-				//std::cout << "initialized: " << counter << "; " << i << "; " << j << "; " << turns << std::endl;
-				//counter++;
 			}
 			std::cout << "Running" << std::endl;
 		}
 	}
-	std::cout << longestMatch << std::endl;
 	/*
 	 * Explanation of output:
 	 * First Column: Relative wins of one cube in every game (order of cubes from input file); Movement: Downwards
@@ -141,6 +152,20 @@ void fillResult(std::vector<std::vector<int>>& r, std::vector<int>& generalR) {
 		r.push_back(temp);
 		generalR.push_back(0);
 	}
+}
+
+bool determineWinable(Player& ply) {
+	std::set<int> unoccupied = ply.unoccupiedFinish();
+
+	for (Figure f : ply.getFigures()) {
+		for (auto i = unoccupied.begin(); i != unoccupied.end(); i++) {
+			if (ply.getDie().has(*i - f.getPosition()) || *i - f.getPosition() > ply.getDie().smallest()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 bool output(const std::string& file, const std::vector<std::vector<int>>& result, const std::vector<int>& absoluteWins) {

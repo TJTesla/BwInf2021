@@ -15,6 +15,7 @@ Die::Die(const std::vector<int>& pSides) {
 			this->has6 = true;
 			break;
 		}
+		sidesSet.insert(s);
 	}
 }
 
@@ -22,8 +23,16 @@ int Die::roll() {
 	return sides.at(rand() % sides.size());
 }
 
+bool Die::has(int num) {
+	return sidesSet.find(num) != sidesSet.end();
+}
+
 bool Die::gotNo6() const {
 	return !has6;
+}
+
+int Die::smallest() const {
+	return *(sidesSet.begin());
 }
 
 
@@ -75,11 +84,12 @@ Player::Player() {
 	sortFigures();
 }
 
-void Player::move() {
+bool Player::move() {
 	if (this->currentDie == nullptr) {
-		return;
+		return false;
 	}
 	this->alreadyMovedInTurn = false;
+	bool changed = false;
 
 	int dieResult = this->currentDie->roll();
 
@@ -88,6 +98,7 @@ void Player::move() {
 			int nextPosition = figs.at(i).getPosition() + dieResult;
 			if (nextPosition <= boardLength-1 && !onField(nextPosition) && figs.at(i).getField() == Fields::RUNWAY) {
 				changePosition(i, dieResult);
+				changed = true;
 				break;
 			}
 		}
@@ -95,10 +106,10 @@ void Player::move() {
 		if (dieResult == 6) {
 			this->move();
 		}
-		return;
+		return changed;
 	}
 
-	if (dieResult == 6 && !everythingOn(Fields::RUNWAY)) {
+	if (dieResult == 6 && !everythingOn(Fields::RUNWAY)) {  // Set figure from B field on runway
 		int firstOnBIndex = -1;
 		for (int i = 0; i < figs.size(); i++) {
 			if (figs.at(i).getField() == Fields::B) {
@@ -110,23 +121,25 @@ void Player::move() {
 			figs.at(firstOnBIndex).setField(Fields::RUNWAY);
 			figs.at(firstOnBIndex).setPosition(0);
 			occupiedSpaces.insert(0);
+			changed = true;
 
 			sortFigures();
 			this->alreadyMovedInTurn = true;
 
 			this->move();
-			return;
+			return changed;
 		}
 	}
 
 	if (dieResult != 6 && everythingOn(Fields::B)) {  // Everything on B and no 6 -> Nothing can move out
-		return;
+		return changed;
 	}
 	for (int i = 0; i < figs.size(); i++) {  // Search for first element that can move
 		int nextPos = figs.at(i).getPosition() + dieResult;
 
 		if (nextPos <= boardLength-1 && !onField(nextPos) && figs.at(i).getField() == Fields::RUNWAY) {
 			changePosition(i, dieResult);
+			changed = true;
 			break;
 		}
 	}
@@ -134,6 +147,7 @@ void Player::move() {
 	if (dieResult == 6) {
 		this->move();
 	}
+	return changed;
 }
 
 bool Player::onField(const int& f) {
@@ -152,7 +166,7 @@ void Player::changePosition(int index, int amount) {
 	this->alreadyMovedInTurn = true;
 }
 
-void Player::sortFigures() {
+void Player::sortFigures() {  // Simple bubble sort implementation
 	for (int i = 0; i < figs.size(); i++) {
 		for (int j = 0; j < figs.size()-i-1; j++) {
 			if (figs.at(j+1) < figs.at(j)) {
@@ -175,13 +189,13 @@ bool Player::everythingOn(Fields type) {
 
 void Player::canHit(Player& ply2) {
 	std::vector<Figure*> f1, f2;
-	fillActivePlayers(f1, this->figs);
+	fillActivePlayers(f1, this->figs);  // Ignore player on B fields
 	fillActivePlayers(f2, ply2.figs);
 
 	int tempBoardLength = boardLength-4;
 
 	for (auto& i : f1) {
-		int adjustedIndex = (tempBoardLength + i->getPosition() - (tempBoardLength-4)/2) % tempBoardLength;
+		int adjustedIndex = (tempBoardLength + i->getPosition() - (tempBoardLength-4)/2) % tempBoardLength;  // Readjust board for offset second board
 		for (auto& j : f2) {
 
 			if (adjustedIndex == j->getPosition()) {
@@ -228,4 +242,22 @@ void Player::initialize() {
 
 void Player::giveDie(Die* newDie) {
 	this->currentDie = newDie;
+}
+
+Die Player::getDie() const {
+	return *currentDie;
+}
+
+std::set<int> Player::unoccupiedFinish() {  // Returns fields of goal fields where no figure is on
+	std::set<int> res = { 40, 41, 42, 43 };
+	for (int i = 40; i < boardLength; i++) {
+		if (onField(i)) {
+			res.erase(res.find(i));
+		}
+	}
+	return res;
+}
+
+std::array<Figure, 4> Player::getFigures() const {
+	return this->figs;
 }

@@ -17,11 +17,14 @@ constexpr int boardLength = 44;
 class Die {
 private:
 	std::vector<int> sides;
+	std::set<int> sidesSet;
 	bool has6;
 public:
 	explicit Die(const std::vector<int>& pSides);
 	int roll();
+	bool has(int num);
 	[[nodiscard]] bool gotNo6() const;
+	[[nodiscard]] int smallest() const;
 };
 
 
@@ -63,11 +66,15 @@ private:  // Functions
 public:
 	Player();
 	~Player() = default;
-	void move();
+	bool move();
 	void canHit(Player& ply2);
 	bool won();
 	void giveDie(Die* newDie);
 	void initialize();
+
+	[[nodiscard]] Die getDie() const;
+	[[nodiscard]] std::set<int> unoccupiedFinish();
+	[[nodiscard]] std::array<Figure, 4> getFigures() const;
 };
 
 #endif //AUFGABE4_CLASSES_H

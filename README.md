@@ -19,7 +19,7 @@ MWG go brrrrr
   <tr>
     <td> Aufgabe 4 </td>
     <td> TJTesla </td>
-    <td> Only documentation is missing </td>
+    <td> finished </td>
   </tr>
   <tr>
     <td> Aufgabe 5 </td>

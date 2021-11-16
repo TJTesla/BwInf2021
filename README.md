@@ -6,6 +6,11 @@ MWG go brrrrr
 
 ## Assignments
 <table>
+   <tr>
+    <td> Aufgabe 1 </td>
+    <td> ??? </td>
+    <td> not finished </td>
+  </tr>
   <tr>
     <td> Aufgabe 2 </td>
     <td> TJTesla </td>

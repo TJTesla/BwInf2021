@@ -8,7 +8,7 @@ MWG go brrrrr
 <table>
    <tr>
     <td> Aufgabe 1 </td>
-    <td> ??? </td>
+    <td> EdekaConnoisseur </td>
     <td> not finished </td>
   </tr>
   <tr>
@@ -18,7 +18,7 @@ MWG go brrrrr
   </tr>
   <tr>
     <td> Aufgabe 3 </td>
-    <td> EdekaConnoisseur </td>
+    <td> ??? </td>
     <td> not finished </td>
   </tr>
   <tr>

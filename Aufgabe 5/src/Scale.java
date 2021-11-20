@@ -5,13 +5,21 @@ import java.util.Scanner;
 public class Scale {
 
     private ArrayList<Integer> weights;//Werte in g
+    private Scanner scanner;
+    private String scannerInput;
 
     public static void main(String[] args) {
         new Scale();
     }
 
     public Scale() {
-        Start();
+        weights = new ArrayList<>();
+        scanner = new Scanner(System.in);
+        scannerInput = scanner.next();
+        while (!scannerInput.equalsIgnoreCase("done")) {
+            addWeight(Integer.parseInt(scannerInput));
+            scannerInput = scanner.next();
+        }
         weights.add(10);
         weights.add(10);
         weights.add(10);
@@ -32,15 +40,6 @@ public class Scale {
         for (int weight : weights)
             System.out.println("Gewicht: " + weight);
         check();
-    }
-
-    /*
-    Consoleneingabe
-     */
-    private void Start() {
-        weights = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-        addWeight(scanner.nextInt());
     }
 
     /*

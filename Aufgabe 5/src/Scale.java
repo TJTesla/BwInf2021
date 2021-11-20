@@ -20,7 +20,7 @@ public class Scale {
             addWeight(Integer.parseInt(scannerInput));
             scannerInput = scanner.next();
         }
-        weights.add(10);
+        /*weights.add(10);
         weights.add(10);
         weights.add(10);
         weights.add(50);
@@ -34,7 +34,7 @@ public class Scale {
         weights.add(1000);
         weights.add(1000);
         weights.add(1000);
-        weights.add(5000);
+        weights.add(5000);*/
         Collections.sort(weights);//sortieren von klein nach groß
         System.out.println("Gewichtsliste:");
         for (int weight : weights)

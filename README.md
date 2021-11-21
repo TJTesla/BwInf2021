@@ -17,11 +17,6 @@ MWG go brrrrr
     <td> finished </td>
   </tr>
   <tr>
-    <td> Aufgabe 3 </td>
-    <td> ??? </td>
-    <td> not finished </td>
-  </tr>
-  <tr>
     <td> Aufgabe 4 </td>
     <td> TJTesla </td>
     <td> finished </td>

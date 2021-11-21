@@ -20,7 +20,7 @@ public class Scale {
             addWeight(Integer.parseInt(scannerInput));
             scannerInput = scanner.next();
         }
-        /*weights.add(10);
+        weights.add(10);
         weights.add(10);
         weights.add(10);
         weights.add(50);
@@ -34,7 +34,7 @@ public class Scale {
         weights.add(1000);
         weights.add(1000);
         weights.add(1000);
-        weights.add(5000);*/
+        weights.add(5000);
         Collections.sort(weights);//sortieren von klein nach groß
         System.out.println("Gewichtsliste:");
         for (int weight : weights)
@@ -93,17 +93,19 @@ public class Scale {
         return false;
     }
 
-    private boolean addLowerWeight1(int weight, int minWeight, int add) {
+    private boolean addLowerWeight1(int weight, int minWeight, int add1) {
         for (int i = 0; i < weights.size() - 1; i++) {//i = Gewichts-Index der Liste
-            int newWeight = weights.get(i) + minWeight + weights.get(add);//Die Gewichte auf der rechten Seite
-            if (weight == newWeight) {//Sack = Gewichte
-                System.out.println(weight + " Gramm schwerer Sack auf der linken Seite und " + minWeight + ", " + weights.get(add - 1) + " und " + weights.get(i) + " Gramm schweres Gewicht auf der reechten Seite\n");
-                return true;
-            } else if (weight < newWeight) {//Sack < Gewichte
-                if (i != 0) {
-                    return addLowerWeight2(weight, minWeight, add, i);
-                } else {
-                    return false;
+            if (i != add1) {//Nicht das gleiche Gewicht
+                int newWeight = weights.get(i) + minWeight + weights.get(add1);//Die Gewichte auf der rechten Seite
+                if (weight == newWeight) {//Sack = Gewichte
+                    System.out.println(weight + " Gramm schwerer Sack auf der linken Seite und " + minWeight + ", " + weights.get(add1 - 1) + " und " + weights.get(i) + " Gramm schweres Gewicht auf der rechten Seite\n");
+                    return true;
+                } else if (weight < newWeight) {//Sack < Gewichte
+                    if (i != 0) {
+                        return addLowerWeight2(weight, minWeight, add1, i);
+                    } else {
+                        return false;
+                    }
                 }
             }
         }
@@ -112,10 +114,29 @@ public class Scale {
 
     private boolean addLowerWeight2(int weight, int minWeight, int add1, int add2) {
         for (int i = 0; i < weights.size() - 1; i++) {//i = Gewichts-Index der Liste
-            if (i != add1 && i != add2) {
+            if (i != add1 && i != add2) {//Nicht das gleiche Gewicht
                 int newWeight = weights.get(i) + minWeight + weights.get(add1) + weights.get(add2);//Die Gewichte auf der rechten Seite
                 if (weight == newWeight) {//Sack = Gewichte
                     System.out.println(weight + " Gramm schwerer Sack auf der linken Seite und " + minWeight + ", " + weights.get(i) + ", " + weights.get(add1) + " und " + weights.get(add2) + " Gramm schweres Gewicht auf der reechten Seite\n");
+                    return true;
+                } else if (weight < newWeight) {//Sack < Gewichte
+                    if (i != 0) {
+                        return addLowerWeight3(weight, minWeight, add1, add2, i);
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean addLowerWeight3(int weight, int minWeight, int add1, int add2, int add3) {
+        for (int i = 0; i < weights.size() - 1; i++) {//i = Gewichts-Index der Liste
+            if (i != add1 && i != add2 && i != add3) {//Nicht das gleiche Gewicht
+                int newWeight = weights.get(i) + minWeight + weights.get(add1) + weights.get(add2) + weights.get(add3);//Die Gewichte auf der rechten Seite
+                if (weight == newWeight) {//Sack = Gewichte
+                    System.out.println(weight + " Gramm schwerer Sack auf der linken Seite und " + minWeight + ", " + weights.get(i) + ", " + weights.get(add1) + ", " + weights.get(add2) + " und " + weights.get(add3) + " Gramm schweres Gewicht auf der reechten Seite\n");
                     return true;
                 } else if (weight < newWeight) {//Sack < Gewichte
                     return false;

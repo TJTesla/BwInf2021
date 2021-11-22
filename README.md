@@ -9,7 +9,7 @@ MWG go brrrrr
    <tr>
     <td> Aufgabe 1 </td>
     <td> EdekaConnoisseur </td>
-    <td> working on documentation </td>
+    <td> finished </td>
   </tr>
   <tr>
     <td> Aufgabe 2 </td>

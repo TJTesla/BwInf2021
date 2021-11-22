@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Schiebeparkplatz
+comment1.params=beispieldatei
+comment1.target=Schiebeparkplatz(int)
+comment2.params=anzahlPlaetze\ querAutoListe
+comment2.target=void\ verschieben(int,\ List)
+comment3.params=anzahlPlaetze\ querAutoListe
+comment3.target=java.lang.String[]\ erkenneBelegtePlaetze(int,\ List)
+comment4.params=autoPosition\ belegtePlaetze
+comment4.target=java.lang.String\ ermittleVerschiebungRechts(int,\ java.lang.String[])
+comment5.params=autoPosition\ belegtePlaetze
+comment5.target=java.lang.String\ ermittleVerschiebungLinks(int,\ java.lang.String[])
+numComments=6

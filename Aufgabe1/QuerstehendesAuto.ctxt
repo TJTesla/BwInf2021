@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=QuerstehendesAuto
+comment1.params=pBezeichnung\ pPosition
+comment1.target=QuerstehendesAuto(java.lang.String,\ int)
+comment2.params=
+comment2.target=java.lang.String\ getBezeichnung()
+comment3.params=
+comment3.target=int\ getPosition()
+numComments=4

@@ -24,7 +24,7 @@ MWG go brrrrr
   <tr>
     <td> Aufgabe 5 </td>
     <td> filler-dev </td>
-    <td> documantation missing </td>
+    <td> documentation only partially finished </td>
   </tr>
 </table>
   

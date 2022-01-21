@@ -6,7 +6,7 @@ MWG go brrrrr
 
 ## Results
 - 1st round completed and progressing in the second
-- Won 1st price with 14 out of 15 points
+- Won 1st prize with 14 out of 15 points
 ### Points
 <table>
   <tr>
